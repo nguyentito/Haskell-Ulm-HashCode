@@ -27,6 +27,7 @@ main :: IO ()
 main = printSolution . solve . parse =<< readFile "doodle.txt"
 
 solve :: (Int, Int, U.Vector Bool) -> Solution
-solve (h, w, t) = undefined
+solve (h, w, t) = map paintCell . filter (t !) $ indices
   where t ! (i, j) = t U.! (i*h+j)
-
+        indices = [(i,j) | i <- [0..(h-1)], j <- [0..(w-1)]]
+        paintCell (i, j) = PaintSQ i j 0
