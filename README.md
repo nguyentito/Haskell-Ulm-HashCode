@@ -1,4 +1,4 @@
 Haskell-Ulm-HashCode
 ====================
 
-Team `<$><*>` FTW!
+Team `<$><*>` !
