@@ -36,3 +36,10 @@ aStarSol g gNodes i goal =
   let path = findAStar g gNodes i goal
       (_, cost) = L.foldl' (\ (l, c) j -> (j, c + mkDist g l j)) (i, 0) path
   in (cost, path)
+
+aStarSol2 :: (Int -> Bool) -> Graph -> GraphNodes -> Int -> (Int, [Int])
+aStarSol2 pred g gNodes i =
+  let path = fromJust $ aStar (mkIndexToSet g) (mkDist g) (const 0) pred i
+      (_, cost) = L.foldl' (\ (l, c) j -> (j, c + mkDist g l j)) (i, 0) path
+  in (cost, path)
+
