@@ -47,11 +47,10 @@ extractSolution = map f
 score :: Edge -> Double
 score (_, (time, length)) = fromIntegral length / fromIntegral time
 
-solution :: Datum -> Rand StdGen (Set (Int, Int), Solution)
-solution ((t, c, s), graph, nodes) =
+solution :: [Int] -> Datum -> Rand StdGen (Set (Int, Int), Solution)
+solution startingPoints ((t, c, s), graph, nodes) =
   f init2ndPhase (Set.fromList (concat alreadyTakenEdgeLists))
-  where startingPoints = [k * 1000 | k <- [1..8]]
-        firstPhase = zip startingPoints $ map (aStarSol graph nodes s) startingPoints
+  where firstPhase = zip startingPoints $ map (aStarSol graph nodes s) startingPoints
         (init2ndPhase, alreadyTakenEdgeLists) = unzip . map h $ firstPhase
           where h (point, (cost, path)) =
                   let path' = s:path in
@@ -110,9 +109,10 @@ totalScore edges graph = sum . map f . Set.toList $ edges
                    in length
 
 main = do
-  datum@(_, graph, _) <- getGraph
+  datum@(_, graph, graphNodes) <- getGraph
   let f (bestScore, bestSol) () = do
-        (takenEdges, sol) <- evalRandIO . solution $ datum
+        startingPoints <- evalRandIO $ getEight graph
+        (takenEdges, sol) <- evalRandIO . solution startingPoints$ datum
         let score = totalScore takenEdges graph
         return $ if score > bestScore then (score, sol) else (bestScore, bestSol)
   (score, sol) <- foldM f (0, [[]]) $ replicate 1 ()
