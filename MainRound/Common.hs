@@ -1,3 +1,5 @@
+module Common where
+
 import Control.Applicative
 import Data.List
 import Data.Function
@@ -29,5 +31,4 @@ parse str =
 
 type Solution = [[(Int, Int)]]
 
-main = undefined
 
