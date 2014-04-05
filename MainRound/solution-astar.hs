@@ -12,6 +12,7 @@ import Data.Set (Set)
 import qualified Data.Set as Set
 import qualified Data.Vector as V
 import System.IO
+import Debug.Trace
 
 import Common
 import Astar
@@ -77,7 +78,7 @@ solution startingPoints ((t, c, s), graph, nodes) =
                    return (Set.insert (unorderedEdge pos i) takenEdges, moveTo i cost)
                  [] -> do
                    let closePoint = bfs pred pos graph
-                         where pred x = let neighbors = graph V.! x in
+                         where pred x = let neighbors =  filter (\(_, (cost, _)) -> cost <= remaining) $ graph V.! x in
                                  any (not . (`Set.member` takenEdges)
                                       . unorderedEdge x
                                       . fst)
@@ -89,8 +90,8 @@ solution startingPoints ((t, c, s), graph, nodes) =
           where moveTo i cost = Progress (i, remaining - cost, i:history)
 
 
-bfs pred start graph = loop Set.empty [start]
-  where loop visited toVisit =
+bfs pred start graph = loop 0 Set.empty [start]
+  where loop n visited toVisit =
           let f x | pred x = Left x
                   | otherwise = Right . map fst $ graph V.! x
           in case mapM f toVisit of
@@ -98,7 +99,7 @@ bfs pred start graph = loop Set.empty [start]
             Right l -> let visited' = visited `Set.union` Set.fromList toVisit
                            toVisit' = nub . filter (not . (`Set.member` visited'))
                                       . concat $ l
-                       in loop visited' toVisit'
+                       in loop (n+1) visited' toVisit'
            
                     
 unorderedEdge i j = (min i j, max i j)
@@ -115,7 +116,7 @@ main = do
         (takenEdges, sol) <- evalRandIO . solution startingPoints$ datum
         let score = totalScore takenEdges graph
         return $ if score > bestScore then (score, sol) else (bestScore, bestSol)
-  (score, sol) <- foldM f (0, [[]]) $ replicate 1 ()
+  (score, sol) <- foldM f (0, [[]]) $ replicate 100 ()
   hPutStrLn stderr $ show score
   printSolution sol
 
