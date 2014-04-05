@@ -26,6 +26,8 @@ parse str =
         parcours n (x:xs) = let ((m,_):_) = x in
           if n == m then map snd x : parcours (n+1) xs
           else [] : parcours (n+1) (x:xs)
-      
+
+type Solution = [[(Int, Int)]]
+
 main = undefined
 
