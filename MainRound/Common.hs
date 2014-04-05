@@ -52,19 +52,19 @@ printSolution sol = do
     printTraj t = do
       print (length t)
       mapM_ print t
-
     
 testSol = [[1, 5, 6], [1, 7], [1, 2, 3]]
 
-chooseIn :: RandomGen g => Vector a -> Rand g a
-chooseIn v = (v V.!) <$> (getRandomR (0, (V.length v - 1)))
+chooseIn :: RandomGen g => Vector a -> Rand g Int
+chooseIn v = (getRandomR (0, (V.length v - 1)))
  
-getEight :: RandomGen g => Vector a -> Rand g [a]
+getEight :: RandomGen g => Vector a -> Rand g [Int]
 getEight v = replicateM 8 (chooseIn v)
  
 sq x = x * x
  
 variance gN cs = sum [let (i1, j1) = gN V.! c1 in let (i2, j2) = gN V.! c2 in sq (i1 - i2) + sq (j1 - j2)
                    | c1 <- cs, c2 <- cs]
+
 
 
