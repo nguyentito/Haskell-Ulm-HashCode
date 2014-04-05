@@ -2,6 +2,7 @@
 
 import Control.Applicative
 import Control.Monad
+import Control.Monad.Instances
 import Control.Monad.Random
 import qualified Data.IntMap as IM
 import Data.Function
@@ -76,14 +77,34 @@ solution ((t, c, s), graph, nodes) =
                    let (i, (cost,_)) = unvisited !! ix
                    return (Set.insert (unorderedEdge pos i) takenEdges, moveTo i cost)
                  [] -> do
-                   ix <- getRandomR (0, length reachable - 1)
-                   let (i, (cost,_)) = sorted !! ix
-                   return (takenEdges, moveTo i cost)
+                   let closePoint = bfs pred pos graph
+                         where pred x = let neighbors = graph V.! x in
+                                 any (not . (`Set.member` takenEdges)
+                                      . unorderedEdge x
+                                      . fst)
+                                      $ neighbors
+                       (cost, path) = aStarSol graph nodes pos closePoint
+                   return (takenEdges, if cost > remaining then Stuck history
+                                       else Progress (closePoint, remaining - cost,
+                                                      reverse path ++ history))
           where moveTo i cost = Progress (i, remaining - cost, i:history)
 
+
+bfs pred start graph = loop Set.empty [start]
+  where loop visited toVisit =
+          let f x | pred x = Left x
+                  | otherwise = Right . map fst $ graph V.! x
+          in case mapM f toVisit of
+            Left x -> x
+            Right l -> let visited' = visited `Set.union` Set.fromList toVisit
+                           toVisit' = nub . filter (not . (`Set.member` visited'))
+                                      . concat $ l
+                       in loop visited' toVisit'
+           
+                    
 unorderedEdge i j = (min i j, max i j)
 
-totalScore takenEdges graph = sum . map f . Set.toList $ takenEdges
+totalScore edges graph = sum . map f . Set.toList $ edges
   where f (i, j) = let (Just (_, length)) =
                          (lookup j $ graph V.! i) <|> (lookup i $ graph V.! j)
                    in length
@@ -94,7 +115,7 @@ main = do
         (takenEdges, sol) <- evalRandIO . solution $ datum
         let score = totalScore takenEdges graph
         return $ if score > bestScore then (score, sol) else (bestScore, bestSol)
-  (score, sol) <- foldM f (0, [[]]) $ replicate 100 ()
+  (score, sol) <- foldM f (0, [[]]) $ replicate 1 ()
   hPutStrLn stderr $ show score
   printSolution sol
 
