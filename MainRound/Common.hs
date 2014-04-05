@@ -11,13 +11,15 @@ type Edge = (Int, (Int, Int)) -- index, (time, length)
 type Graph = Vector [Edge] -- adjacency list
 type GraphNodes = Vector (Double, Double)
 
-getGraph :: IO ((Int, Int, Int), Graph, GraphNodes)
+type Datum = ((Int, Int, Int), Graph, GraphNodes)
+
+getGraph :: IO Datum
 getGraph = parse <$> readFile "paris_54000.txt"
 
 pairFromList (i : j : []) = (i, j)
 pairFromList _ = error "pairFromList"
 
-parse :: String -> ((Int, Int, Int), Graph, GraphNodes)
+parse :: String -> Datum
 parse str =
   let (header:rest) = lines str
       [n, m, t, c, s] = map (read :: String -> Int) . words $ header

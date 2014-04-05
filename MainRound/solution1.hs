@@ -45,8 +45,8 @@ extractSolution = map f
 score :: Edge -> Double
 score (_, (time, length)) = fromIntegral length / fromIntegral time
 
-solution :: ((Int, Int, Int), Graph) -> Rand StdGen (Set (Int, Int), Solution)
-solution ((t, c, s), graph) = f init Set.empty
+solution :: Datum -> Rand StdGen (Set (Int, Int), Solution)
+solution ((t, c, s), graph, _) = f init Set.empty
   where init = replicate c (Progress (s, t, [s]))
         f state takenEdges
           | all isStuck state = return $ (takenEdges, extractSolution state)
@@ -78,7 +78,7 @@ totalScore takenEdges graph = sum . map f . Set.toList $ takenEdges
                    in length
 
 main = do
-  datum@(_, graph) <- getGraph
+  datum@(_, graph, _) <- getGraph
   let f (bestScore, bestSol) () = do
         (takenEdges, sol) <- evalRandIO . solution $ datum
         let score = totalScore takenEdges graph
