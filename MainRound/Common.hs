@@ -6,8 +6,8 @@ import Data.Function
 import Data.Vector (Vector)
 import qualified Data.Vector as V
 
-type Node = (Int, (Int, Int)) -- index, (time, length)
-type Graph = Vector [Node] -- adjacency list
+type Edge = (Int, (Int, Int)) -- index, (time, length)
+type Graph = Vector [Edge] -- adjacency list
 
 getGraph :: IO ((Int, Int, Int), Graph)
 getGraph = parse <$> readFile "paris_54000.txt"
@@ -45,6 +45,3 @@ printSolution sol = do
     
 testSol = [[1, 5, 6], [1, 7], [1, 2, 3]]
 
-
-
-main = printSolution testSol
