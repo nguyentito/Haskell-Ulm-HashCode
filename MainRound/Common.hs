@@ -8,18 +8,24 @@ import qualified Data.Vector as V
 
 type Node = (Int, (Int, Int)) -- index, (time, length)
 type Graph = Vector [Node] -- adjacency list
+type GraphNodes = Vector (Double, Double)
 
-getGraph :: IO ((Int, Int, Int), Graph)
+getGraph :: IO ((Int, Int, Int), Graph, GraphNodes)
 getGraph = parse <$> readFile "paris_54000.txt"
 
-parse :: String -> ((Int, Int, Int), Graph)
+pairFromList (i : j : []) = (i, j)
+pairFromList _ = error "pairFromList"
+
+parse :: String -> ((Int, Int, Int), Graph, GraphNodes)
 parse str =
   let (header:rest) = lines str
       [n, m, t, c, s] = map (read :: String -> Int) . words $ header
+      nodes = take n rest
       edges = take m . drop n $ rest -- drop nodes
       graph = V.fromList . parcours 0 . groupBy (\x y -> fst x == fst y)
               . sortBy (compare `on` fst) . concatMap parseEdge $ edges
-  in ((t, c, s), graph)
+      graphNodes = V.fromList $ map (pairFromList . map read . words) nodes
+  in ((t, c, s), graph, graphNodes)
   where parseEdge s =
           let [a, b, d, c, l] = map (read :: String -> Int) . words $ s in
           if d == 1 then [(a, (b, (c, l)))]
