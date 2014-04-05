@@ -111,12 +111,13 @@ totalScore edges graph = sum . map f . Set.toList $ edges
 
 main = do
   datum@(_, graph, graphNodes) <- getGraph
-  let f (bestScore, bestSol) () = do
+  let f (bestScore, bestSol) n = do
         startingPoints <- evalRandIO $ getEight graph
         (takenEdges, sol) <- evalRandIO . solution startingPoints$ datum
         let score = totalScore takenEdges graph
+        hPutStrLn stderr $ "Essai numéro " ++ show n ++ " : score = " ++ show score
         return $ if score > bestScore then (score, sol) else (bestScore, bestSol)
-  (score, sol) <- foldM f (0, [[]]) $ replicate 100 ()
+  (score, sol) <- foldM f (0, [[]]) [1..300]
   hPutStrLn stderr $ show score
   printSolution sol
 
