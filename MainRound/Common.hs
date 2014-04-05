@@ -29,6 +29,22 @@ parse str =
           if n == m then map snd x : parcours (n+1) xs
           else [] : parcours (n+1) (x:xs)
 
-type Solution = [[(Int, Int)]]
+type Solution = [[Int]]
 
 
+printSolution :: Solution -> IO ()
+printSolution sol = do
+  print c
+  mapM_ printTraj sol
+  where
+    c = length sol
+    printTraj t = do
+      print (length t)
+      mapM_ print t
+
+    
+testSol = [[1, 5, 6], [1, 7], [1, 2, 3]]
+
+
+
+main = printSolution testSol
