@@ -71,3 +71,12 @@ getBestEight gN = do
   eights <- replicateM 100 (getEight gN)
   let sorted = sortBy (\e1 e2 -> variance gN e2 `compare` variance gN e1) eights
   return $ head sorted
+
+vectBetween (x, y) (x', y') = (x' - x, y' - y)
+
+vectNormSq (x, y) = x*x + y*y
+
+determinant (x, y) (x', y') = x*x' - y*y'
+
+sinAngle v w = determinant v w / sqrt (vectNormSq v * vectNormSq w)
+
