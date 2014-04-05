@@ -7,7 +7,7 @@ import qualified Data.Vector as V
 type Node = (Int, (Int, Int)) -- index, (time, length)
 type Graph = Vector [Node] -- adjacency list
 
-getGraph :: IO Graph
+getGraph :: IO ((Int, Int, Int), Graph)
 getGraph = parse <$> readFile "paris_54000.txt"
 
 parse :: String -> ((Int, Int, Int), Graph)
@@ -27,5 +27,5 @@ parse str =
           if n == m then map snd x : parcours (n+1) xs
           else [] : parcours (n+1) (x:xs)
       
-main = print <$> getGraph
+main = undefined
 
