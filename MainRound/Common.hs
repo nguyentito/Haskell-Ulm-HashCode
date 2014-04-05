@@ -67,4 +67,7 @@ variance gN cs = sum [let (i1, j1) = gN V.! c1 in let (i2, j2) = gN V.! c2 in sq
                    | c1 <- cs, c2 <- cs]
 
 
-
+getBestEight gN = do
+  eights <- replicateM 100 (getEight gN)
+  let sorted = sortBy (\e1 e2 -> variance gN e1 `compare` variance gN e2) eights
+  return $ head sorted
